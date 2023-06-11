@@ -42,6 +42,7 @@ AWSと接続するために必要な情報は何か、RaspberryPiに組み込む
 
 ----
 # 第１回：  お試しで RaspberryPiをAWS IoTと繋げてみよう
+![](/images/20230611_000.jpg)
 早速やってみましょう。
 第１回は、お試しとしてRaspberryPiをAWS IoT Core　サービスに繋げてみます。
 具体的には、RaspberryPi を最新の状態にした後、
