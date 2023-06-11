@@ -3,7 +3,6 @@ title: "RaspberryPiをクラウドとちゃんと話せるようにする（概�
 emoji: "📘"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["raspberrypi", "yocto", "aws"]
-publication_name: "singularity"
 published: false
 ---
 
