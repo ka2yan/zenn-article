@@ -6,7 +6,10 @@ topics: ["raspberrypi", "yocto", "aws"]
 publication_name: "singularity"
 published: false
 ---
-組込み機器をクラウドを繋げるのは簡単だけど、ちゃんとやるのは意外と難しい。
+
+組込みエンジニア katsu です。
+
+組込み機器をクラウドを繋げるのは簡単だけど、ちゃんとやるのは意外と難しいですよね。
 
 例えば、RaspberryPiをAWS に繋げて、お試し的にメッセージをやり取りできるようにすることは簡単です。
 でも、これを製品としてAWSに繋げようとすると、どうでしょう？
