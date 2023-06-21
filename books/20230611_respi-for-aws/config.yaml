@@ -1,9 +1,13 @@
-title: ""
-summary: ""
-topics: []
+title: "RaspberryPiをAWSと話せるようにする"
+summary: |-
+  組込み機器をクラウドを繋げるのはできたんだけど、製品化するには何すればいいの？
+  そんな方のために、
+  ここでは、RaspberrypPiを製品と見立てて、AWSと接続するために必要な知識を、手を動かして学んでいきたいと思います。
+
+topics: ["raspberrypi", "yocto", "aws"]
 published: false
 price: 0 # 有料の場合200〜5000
 # 本に含めるチャプターを順番に並べましょう
 chapters:
-  - example1
+  - introduction
   - example2
