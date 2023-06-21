@@ -3,7 +3,7 @@ title: "お試しで RaspberryPiをAWS IoTと繋げる"
 ---
 ![](/images/20230611_000.jpg)
 早速やってみましょう。
-第１回は、お試しとしてRaspberryPiをAWS IoT Core　サービスに繋げてみます。
+第１章は、お試しとしてRaspberryPiをAWS IoT Core　サービスに繋げてみます。
 具体的には、RaspberryPi を最新の状態にした後、
 AWS IoT Coreと一緒に設定して、
 RaspberryPiとお話ができるようにしていきます。
@@ -329,6 +329,5 @@ AWSのページでも確認できます！
 
 これで、RaspberryPiから好きな時に、好きなメッセージを送ることができるようになりました。
 
-第１回は以上です。
+第１章は以上です。
 次回、第２回は、RaspberryPiをゼロからビルドできる環境を構築します。
-引き続き、よろしくお願いします。
