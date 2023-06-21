@@ -1,5 +1,5 @@
 ---
-title: "お試しで RaspberryPiをAWS IoTと繋げる"
+title: "RaspberryPiをAWS IoTに繋げてみる"
 ---
 ![](/images/20230611_000.jpg)
 早速やってみましょう。
@@ -10,6 +10,7 @@ RaspberryPiとお話ができるようにしていきます。
 
 ## 使用する機材
 - Raspberry Pi 2
+Raspberry Pi 3, 4 でも同じ手順になります
 - micro-SD
 - Macbook Air
   Raspberry Pi Imager, Terminal
