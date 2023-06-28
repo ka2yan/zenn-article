@@ -19,14 +19,26 @@ x
 
 ## Yocto仕組み
 Yoctoビルドシステムを図で表すと以下のようになります。
-図
+![](/images/20230628_110.png)
+
+[Yoctoドキュメント](https://docs.yoctoproject.org/overview-manual/yp-intro.html)はこちら。
 ちょっと難しそうですね。
+私たちが指定するのは、左側の各種設定（Configuration）です。
+その設定に従って、ソースコード（Source Materials）を取得（Fetch）して、
+Patch当てて、ビルドして、Packageingしてくれたり、
+組込み機器向けのイメージ（Images）を作ってくれたりします
+
 とは言え、まずは知っておくべきなのは以下です。
 ### Bitbake
-### Meta-Layer
+Yoctoで使用するビルドコマンドです。
 ### Recipe
-### ビルドコマンド
-### フォルダ構成
+OSS単位でビルド方法をまとめた調理方法（レシピ）になります。
+どこのGitリポジトリのどのブランチを使用するか、
+どんなパッチを当てるか、configure, make, packaging, license収集方法などを記載します。
+### BSPLayer
+BSP(Board Support Package)レイヤー。
+特定の機器向けに、複数のRecipeをグループ化した情報（レシピ集）になります。
+自分で作成することもできます。
 
 では、事前知識は得たので、早速やってみましょう。
 
@@ -161,17 +173,7 @@ Please select the city or region corresponding to your time zone.
 
   1. Aden      14. Beirut      27. Gaza         40. Karachi       53. Muscat        66. Riyadh         79. Tokyo
   2. Almaty    15. Bishkek     28. Harbin       41. Kashgar       54. Nicosia       67. Sakhalin       80. Tomsk
-  3. Amman     16. Brunei      29. Hebron       42. Kathmandu     55. Novokuznetsk  68. Samarkand      81. Ujung_Pandang
-  4. Anadyr    17. Chita       30. Ho_Chi_Minh  43. Khandyga      56. Novosibirsk   69. Seoul          82. Ulaanbaatar
-  5. Aqtau     18. Choibalsan  31. Hong_Kong    44. Kolkata       57. Omsk          70. Shanghai       83. Urumqi
-  6. Aqtobe    19. Chongqing   32. Hovd         45. Krasnoyarsk   58. Oral          71. Singapore      84. Ust-Nera
-  7. Ashgabat  20. Colombo     33. Irkutsk      46. Kuala_Lumpur  59. Phnom_Penh    72. Srednekolymsk  85. Vientiane
-  8. Atyrau    21. Damascus    34. Istanbul     47. Kuching       60. Pontianak     73. Taipei         86. Vladivostok
-  9. Baghdad   22. Dhaka       35. Jakarta      48. Kuwait        61. Pyongyang     74. Tashkent       87. Yakutsk
-  10. Bahrain  23. Dili        36. Jayapura     49. Macau         62. Qatar         75. Tbilisi        88. Yangon
-  11. Baku     24. Dubai       37. Jerusalem    50. Magadan       63. Qostanay      76. Tehran         89. Yekaterinburg
-  12. Bangkok  25. Dushanbe    38. Kabul        51. Makassar      64. Qyzylorda     77. Tel_Aviv       90. Yerevan
-  13. Barnaul  26. Famagusta   39. Kamchatka    52. Manila        65. Rangoon       78. Thimphu
+  ...
 Time zone: 79
 ...
 done.
@@ -179,7 +181,7 @@ root@b7c4cb3eeb5c:/#
 ```
 数分待つと完了しました。
 
-locale設定します。
+続いて、locale設定します。
 ```
 root@b7c4cb3eeb5c:/# locale-gen en_US.UTF-8
 ```
@@ -246,7 +248,7 @@ MAINTAINERS.md	      README.hardware.md  bitbake	  meta-poky	 meta-yocto-bsp
 ```
 現時点では、meta-raspberrypiフォルダが展開されただけで、ビルド対象には組み込まれていません。
 
-### ビルド環境を整える
+### ビルド環境を準備する
 ビルドに使用する環境変数などを設定してくれるスクリプトを実行します。
 正しく実行できると、カレントディレクトリが "poky/build"に移動します。
 
@@ -289,22 +291,14 @@ Other commonly useful commands are:
  - 'bitbake-layers' handles common layer tasks
  - 'oe-pkgdata-util' handles common target package tasks
 ```
-実行結果を読むと、以下のようなキーワードが出ています。
+実行結果を読むと、以下のような設定ファイルがあることがわかります。
+少し補足します。
 - conf/local.conf
+ビルド対象を指定します。"MACHINE"変数を指定します。
 - conf/bblayers.conf
+BSPレイヤーとして、どのレイヤーを組み込むか指定します。
 - bitbake <target>
-
-### RaspberryPi　BSPレイヤーを追加する
-bblayers.conf に ”meta-raspberrypi" レイヤーを追加すると、
-ビルド対象に追加することができます。
-```diff bash:conf/bblayers.conf
-@@ -9,4 +9,5 @@
-   /home/hoge/raspi2/poky/meta \
-   /home/hoge/raspi2/poky/meta-poky \
-   /home/hoge/raspi2/poky/meta-yocto-bsp \
-+  /home/hoge/raspi2/poky/meta-raspberrypi\
-   "
-```
+ビルドコマンドです。"bitbake"というコマンドを使います。
 
 ### ビルド対象を、RaspberryPi2に設定する
 ```diff bash:conf/local.conf
@@ -315,6 +309,17 @@ bblayers.conf に ”meta-raspberrypi" レイヤーを追加すると、
 +MACHINE ?= "raspberrypi2"
 ```
 RaspberryPi4 とかを使っている場合は、"raspberrypi4-64"としてください。
+
+### RaspberryPi　BSPレイヤーを追加する
+bblayers.conf に ”meta-raspberrypi" レイヤーを追加して、ビルド対象にします。
+```diff bash:conf/bblayers.conf
+@@ -9,4 +9,5 @@
+   /home/hoge/raspi2/poky/meta \
+   /home/hoge/raspi2/poky/meta-poky \
+   /home/hoge/raspi2/poky/meta-yocto-bsp \
++  /home/hoge/raspi2/poky/meta-raspberrypi\
+   "
+```
 
 以上で、準備完了です！
 
@@ -328,9 +333,9 @@ $ bitbake core-image-minimal
 何をしているかというと、
 ```
 $ bitbake core-image-minimal
-Loading cache: 100% |                              | ETA:  --:--:--
+Loading cache: 100% |                                 | ETA:  --:--:--
 Loaded 0 entries from dependency cache.
-Parsing recipes: 100% |#####################################################################################| Time: 0:00:40
+Parsing recipes: 100% |###############################| Time: 0:00:40
 Parsing of 935 .bb files complete (0 cached, 935 parsed). 1838 targets, 74 skipped, 0 masked, 0 errors.
 ```
 Parsing recipies ってところは、BSPレイヤー（meta-xxx）の中にあるレシピ（.bbファイル）を解析して、ビルド対象のOSSを決めて、ビルド順序を決めています。
@@ -344,10 +349,131 @@ Currently  4 running tasks (429 of 3408)  12% |#########
 3: re2c-native-3.0-r0 do_compile - 12s (pid 79170)
 ```
 ビルド対象のOSSは3408個で、１つずつダウンロードして順番にビルドしているところです。
-ここでは、RaspberryPiのビルドをするためのarmコンパイラを作っているところですね。
-そりゃまぁ、時間はかかります。
+上では、RaspberryPiのビルドをするためのarmコンパイラを作っているところです。
+armコンパイラを作ったら、
+RaspberryPi向けのLinuxビルドして、ファイルシステムに組み込む全コマンドをビルドします。
+確かに、時間はかかりそうです。
 
 PCがスリープしないように気をつけて、休憩ください。
 
+:::message
+残念ながらビルド失敗したら、
+- 容量不足によるエラー
+Dockerの空き容量が無い可能性があります。
+"docker system df" コマンドを使って空き容量を確認して、不要なコンテナを削除してください。
+```
+WARNING: The free space of /home/hoge/raspi2/poky/build/tmp (overlay) is running low (0.999GB left)
+ERROR: No new tasks can be executed since the disk space monitor action is "STOPTASKS"!
+```
+- ダウンロードタイムアウトによるエラー
+LinuxKernelのFetch（ダウンロード）に時間がかかって、エラーになる場合があります。
+原因は色々考えられると思いますが、まずはもう一度ビルド実行してください。
+```
+WARNING: linux-raspberrypi-1_6.1.34+gitAUTOINC+ebdf12f741_d4c3133378-r0 do_fetch: Failed to fetch URL git://github.com/raspberrypi/linux.git;name=machine;branch=rpi-6.1.y;protocol=https, attempting MIRRORS if available
+ERROR: linux-raspberrypi-1_6.1.34+gitAUTOINC+ebdf12f741_d4c3133378-r0 do_fetch: Fetcher failure: 
+```
+:::
+
+失敗したら、再度ビルドしたりしつつ、、、、、、やっと終わりました！
+
+```
+$ bitbake core-image-minimal
+Loading cache: 100% |#######################################################################################| Time: 0:00:00
+Loaded 1838 entries from dependency cache.
+NOTE: Resolving any missing task queue dependencies
+
+Build Configuration:
+BB_VERSION           = "2.4.0"
+BUILD_SYS            = "aarch64-linux"
+NATIVELSBSTRING      = "universal"
+TARGET_SYS           = "arm-poky-linux-gnueabi"
+MACHINE              = "raspberrypi2"
+DISTRO               = "poky"
+DISTRO_VERSION       = "4.2"
+TUNE_FEATURES        = "arm vfp cortexa7 neon vfpv4 thumb callconvention-hard"
+TARGET_FPU           = "hard"
+meta                 
+meta-poky            
+meta-yocto-bsp       = "master:13b646c0e167ca52f69c91be5538049b172015ac"
+meta-raspberrypi     = "master:dff85b9a9f66002856b9ed3b1aa3a384c0bc43d9"
+
+Initialising tasks: 100% |##################################################################################| Time: 0:00:01
+Sstate summary: Wanted 1284 Local 0 Mirrors 0 Missed 1284 Current 198 (0% match, 13% complete)
+NOTE: Executing Tasks
+NOTE: Tasks Summary: Attempted 3408 tasks of which 819 didn't need to be rerun and all succeeded.
+```
+"poky/build" 以下を見てみましょう。
+```
+$ ls
+bitbake-cookerdaemon.log  cache  conf  downloads  sstate-cache  tmp
+```
+まず覚えておくのがよいフォルダは、以下です。
+- conf
+先ほどビルド対象を設定したフォルダです。
+- downloads
+ビルドしたソースコード一式
+- sstate-cache
+ビルド結果をキャッシュするフォルダです。
+次回ビルドする時に同じソースコードならここを参照します。
+- tmp
+ビルドした成果物を置くフォルダです。
+tmp/deploy : 最終成果物を置くフォルダ
+tmp/work : ビルドしたソースコードなどが置いてあるフォルダ
+
+## ビルドイメージを取得する
+ビルドイメージは、以下になります（.wic.bz2ファイル）。
+
+```
+$ ls tmp/deploy/images/raspberrypi2/*.wic.bz2
+tmp/deploy/images/raspberrypi2/core-image-minimal-raspberrypi2-20230624163917.rootfs.wic.bz2
+tmp/deploy/images/raspberrypi2/core-image-minimal-raspberrypi2.wic.bz2
+```
+２つあるように見えますが、シンボリックリンクなので日付があるファイルが本体になります。
+
+Mac側で、ターミナルを起動して、
+"docker ps"コマンドで、"raspi2-env"コンテナIDを確認し、
+”docker cp"コマンドで、ビルドイメージを現在のフォルダにコピーします。
+ついでに、"bunzip2"コマンドで解凍しておきます。
+```
+$ docker ps
+CONTAINER ID   IMAGE          COMMAND       CREATED      STATUS              PORTS     NAMES
+b7c4cb3eeb5c   ubuntu:22.04   "/bin/bash"   1 days ago   Up About 10 hour             raspi2-env
+$ docker cp b7c4cb3eeb5c:/home/hoge/raspi2/poky/build/tmp/deploy/images/raspberrypi2/core-image-minimal-raspberrypi2-20230624163917.rootfs.wic.bz2 .
+$ bunzip2 core-image-minimal-raspberrypi2-20230624163917.rootfs.wic.bz2
+$ ls -l
+total 164776
+-rw-r--r--@ 1 macuser  staff  84156416  6 25 10:58 core-image-minimal-raspberrypi2-20230624163917.rootfs.wic
+```
+80MBぐらいのイメージが取り出せました。
+
 ## RaspberryPiに焼いてみる
+書き込みに、前章で使用した RaspberryPi Imager を使用しましょう。
+RaspberryPi Imagerを起動します。
+![](/images/20230611_010.png)
+
+書き込むOSを選択します。
+一番下の「カスタムイメージを使う」から、先ほど用意したビルドイメージを選択します。
+![](/images/20230628_210.png)
+
+RaspberyPi用のSDカードをMacに挿し、
+ストレージに選択します。
+![](/images/20230628_220.png)
+
+「書き込む」ボタンを押して、しばらく待ってください。
+![](/images/20230611_040.png)
+10秒ぐらいで完了しました。
+完了したら、そのままSDカードを抜いてOKです。
+
+## 起動確認する
+RaspberryPiにSDカードを差して、
+HDMIケーブルでディスプレイを接続し、電源投入します。
+そして、、、出ました！
+
+![](/images/20230628_310.jpg)
+Poky（Yocto project Reference Distro) 4.2 raspberrypi2 でビルドされたものです！
+お疲れ様でした！
+
+ということで、
+今回はゼロからビルドして、RasberryPiを起動するところまで行きました。
+
 

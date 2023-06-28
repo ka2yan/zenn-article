@@ -12,7 +12,7 @@ RaspberryPiとお話ができるようにしていきます。
 - Raspberry Pi 2
 Raspberry Pi 3, 4 でも同じ手順になります
 - micro-SD
-- Macbook Air
+- Macbook Air（macOS Ventura 13.4）
   Raspberry Pi Imager, Terminal
 
 ## RaspberryPi を最新の状態にする
