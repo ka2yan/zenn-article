@@ -3,13 +3,13 @@ title: "RaspberryPiをクラウドとちゃんと話せるようにする（第�
 emoji: "📘"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["raspberrypi", "yocto", "aws", "docker"]
-# publication_name: "singularity"
-published: false
+publication_name: "singularity"
+published: true
 
 ---
 組込みエンジニア katsu です。
 
-RaspberryPiをクラウドとちゃんと話せる様にする、第２回です。
+RaspberryPiをクラウドとちゃんと話せるようにする、第２回です。
 全体の位置付けは以下となります。
 
 # [第１回](https://zenn.dev/singularity/articles/20230611_raspi-for-aws-1)
