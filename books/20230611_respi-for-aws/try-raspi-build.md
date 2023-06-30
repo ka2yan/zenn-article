@@ -2,31 +2,35 @@
 title: "RaspberryPiをゼロからビルドする"
 ---
 
-ここでは、Dockerを使ってUbuntu環境を作った後、
+ここでは、Dockerを使ってUbuntu環境を作ってから、
 Yoctoを使ってRaspberryPi向けのビルドをゼロからやってみます。
 
 ## Yoctoとは
 最近のLinuxベースの組込み機器は、Yoctoというビルドシステムを使ってビルドします。
 
-Yoctoがやることは、組込み機器向けのコンパイラ（gcc)を作って、
-OSのLinux kernelはもちろん、関連するコマンドや各種ライブラリの依存関係を考慮して
-機器に組み込むべきOSSを全てダウンロードして、エラーしないような順番でビルドして、
-機器にそのまま使用できるイメージまで作ってくれる優れものです。
-x
+Yoctoがやることは、組込み機器向けのコンパイラ（gcc)を作るところから始まり、
+Linux kernelや、各種コマンドやライブリをビルドして、
+製品向けのイメージまで作ってくれる優れものです。
+
+組み込むコマンドや各種ライブラリをカスタマイズできるのはもちろん、
+いい感じにコマンドやライブラリの依存関係を考慮して
+順番にOSSをダウンロードし、エラーしないような順番でビルドしてくれます。
+
 一昔前は、この全てを手動でやっていました。
 当然ものすごい時間が掛かっていたし、最後まで作るのは職人技でした。
 
 
 ## Yocto仕組み
 Yoctoビルドシステムを図で表すと以下のようになります。
+[公式Yoctoドキュメント](https://docs.yoctoproject.org/overview-manual/yp-intro.html)はこちら。
+
 ![](/images/20230628_110.png)
 
-[Yoctoドキュメント](https://docs.yoctoproject.org/overview-manual/yp-intro.html)はこちら。
 ちょっと難しそうですね。
 私たちが指定するのは、左側の各種設定（Configuration）です。
-その設定に従って、ソースコード（Source Materials）を取得（Fetch）して、
-Patch当てて、ビルドして、Packageingしてくれたり、
-組込み機器向けのイメージ（Images）を作ってくれたりします
+Yoctoでは、その設定に従って、ソースコード（Source Materials）を取得（Fetch）して、
+Patch当てて、ビルドして、組込み機器向けのイメージ（Images）を作ってくれたりします。
+図にありますが、QATestを実行したり、SDK（.debパッケージ）を作ったりもできます。
 
 とは言え、まずは知っておくべきなのは以下です。
 ### Bitbake
@@ -40,10 +44,10 @@ BSP(Board Support Package)レイヤー。
 特定の機器向けに、複数のRecipeをグループ化した情報（レシピ集）になります。
 自分で作成することもできます。
 
-では、事前知識は得たので、早速やってみましょう。
+では、事前知識は得たので、環境作りからやっていきましょう。
 
 ## Docker インストール
-Homebrewで簡単にお手軽インストールしましょう。
+DockerをHomebrewで簡単にお手軽インストールしましょう。
 ターミナルから以下のコマンドでインストールします。
 ```
 $ brew install docker
@@ -60,14 +64,14 @@ Docker version 23.0.5, build bc4487a
 $ open /Applications/Docker.app
 ```
 こんな画面になります。
-
-画像１
+![](/images/20230628_010.png)
 
 とはいえ、ここでは、ターミナルで操作しますので、どこか見えないところに置いておきましょう。
 
 ## Ubuntu22.04環境を構築します
+続いて、ビルドするLinux環境を準備します。
 YoctoがサポートしているLinux 環境のうち、今回は Ubuntu22.04を使用します。
-[Yocto公式ページ](https://docs.yoctoproject.org/ref-manual/system-requirements.html?highlight=ubuntu#supported-linux-distributions)
+[公式Yoctoページ](https://docs.yoctoproject.org/ref-manual/system-requirements.html?highlight=ubuntu#supported-linux-distributions)
 
 Macのターミナルから、DockerコマンドでUbuntuのイメージをとってきます。
 ```
@@ -77,7 +81,7 @@ $ docker pull ubuntu:22.04
 
 イメージが取得できていることを確認しましょう。
 ```
-$ docker image ls
+$ docker images
 REPOSITORY              TAG       IMAGE ID       CREATED        SIZE
 ubuntu                  22.04     3f5ef9003cef   1 days ago    69.2MB
 ```
@@ -90,7 +94,7 @@ $ docker run -it -d --name raspi2-env ubuntu:22.04
 
 ”raspi2-env"が、作成できたか確認します。
 ```
-$ docker container ps
+$ docker ps
 CONTAINER ID   IMAGE          COMMAND       CREATED          STATUS          PORTS     NAMES
 b7c4cb3eeb5c   ubuntu:22.04   "/bin/bash"   48 seconds ago   Up 47 seconds             raspi2-env
 ```
@@ -124,16 +128,12 @@ root@b7c4cb3eeb5c:/# exit
 ＄ 
 ```
 
-
-
-コンテナの起動と停止コマンドは以下です。
-コンテナ内の作業を完全に終了するなら落としておきましょう。
-
 コンテナの開始
 ```
 $ docker start raspi2-env
 ```
 コンテナの停止
+コンテナ内の作業を完全に終了するなら落としておきましょう。
 ```
 $ docker stop raspi2-env
 ```
@@ -146,13 +146,14 @@ root@b7c4cb3eeb5c:/# apt update
 root@b7c4cb3eeb5c:/# apt -y upgrade
 ```
 
-よく使うコマンドは入れておきます。
-エディタと、bashタブ補完するパッケージです。
+次に、よく使うコマンドは入れておきます。
+Vimエディタと、bashタブ補完するパッケージです。
 ```
 apt install -y vim bash-completion
 ```
 
-Yoctoで使用するパッケージを以下記載されています。
+続いて、Yoctoビルドシステムで使用するパッケージをインストールしていきます。
+必要なパッケージは以下記載されています。
 [Yocto公式ページ](https://docs.yoctoproject.org/ref-manual/system-requirements.html#required-packages-for-the-build-host)
 これに従って、インストールします。
 途中、タイムゾーン（tzdata）を選択させられるので、Asia(6), Tokyo(79)を選択します。
@@ -228,11 +229,11 @@ LICENSE		      MAINTAINERS.md  README.OE-Core.md   README.poky.md  contrib	 meta
 LICENSE.GPL-2.0-only  MEMORIAM	      README.hardware.md  README.qemu.md  documentation  meta-selftest	oe-init-build-env
 LICENSE.MIT	      Makefile	      README.md		  bitbake	  meta		 meta-skeleton	scripts
 ```
-meta-xxx というのが、BSPレイヤーです。
+meta-xxx というのが、BSPレイヤー（OSSビルドするレシピを集めたもの）です。
 現在は基本的なものしかありません。
 
 ### RaspberryPi BSPレイヤーを取得する
-ここに、RaspberryPi向けのレイヤーを追加します。
+ここに、RaspberryPi向けのBSPレイヤー（レシピ集）を追加します。
 ```
 $ cd poky
 $ git clone git://git.yoctoproject.org/meta-raspberrypi
@@ -294,13 +295,13 @@ Other commonly useful commands are:
 実行結果を読むと、以下のような設定ファイルがあることがわかります。
 少し補足します。
 - conf/local.conf
-ビルド対象を指定します。"MACHINE"変数を指定します。
+ビルド対象を指定する設定ファイル。"MACHINE"変数を指定します。
 - conf/bblayers.conf
-BSPレイヤーとして、どのレイヤーを組み込むか指定します。
+どの BSPレイヤー（レシピ集）を使うのかを指定する設定ファイル。
 - bitbake <target>
-ビルドコマンドです。"bitbake"というコマンドを使います。
+ビルドコマンドです。"bitbake xxx"という感じで実行します。
 
-### ビルド対象を、RaspberryPi2に設定する
+### ビルド対象に、RaspberryPi2を指定する
 ```diff bash:conf/local.conf
 @@ -36,7 +36,8 @@
  # This sets the default machine to be qemux86-64 if no other machine is selected:
@@ -324,13 +325,14 @@ bblayers.conf に ”meta-raspberrypi" レイヤーを追加して、ビルド�
 以上で、準備完了です！
 
 ## ビルドを実行する
-ビルドには、上で出てきた"bitbake"コマンドを使います。
+ビルドには、"bitbake"コマンドを使います。
 最小限イメージは以下のコマンドでビルドします。
 ```
 $ bitbake core-image-minimal
 ```
-ここでしばらく、数時間、５時間とか待つので、スリープしないようにして気長に待ちまます。
-何をしているかというと、
+実行すると、しばらくというか、４〜５時間とか待つので、スリープしないようにして気長に待ちまます。
+
+このコマンドは、何をしているかというと、
 ```
 $ bitbake core-image-minimal
 Loading cache: 100% |                                 | ETA:  --:--:--
@@ -338,7 +340,7 @@ Loaded 0 entries from dependency cache.
 Parsing recipes: 100% |###############################| Time: 0:00:40
 Parsing of 935 .bb files complete (0 cached, 935 parsed). 1838 targets, 74 skipped, 0 masked, 0 errors.
 ```
-Parsing recipies ってところは、BSPレイヤー（meta-xxx）の中にあるレシピ（.bbファイル）を解析して、ビルド対象のOSSを決めて、ビルド順序を決めています。
+Parsing recipies ってところは、指定されたBSPレイヤー（meta-xxx）の中にあるレシピ（.bbファイル）を解析して、ビルド対象のOSSを決めて、ビルド順序を決めています。
 
 そのまま放置すると、以下のような表示になります。
 ```
@@ -348,8 +350,8 @@ Currently  4 running tasks (429 of 3408)  12% |#########
 2: libffi-native-3.4.4-r0 do_configure - 30s (pid 71626)
 3: re2c-native-3.0-r0 do_compile - 12s (pid 79170)
 ```
-ビルド対象のOSSは3408個で、１つずつダウンロードして順番にビルドしているところです。
-上では、RaspberryPiのビルドをするためのarmコンパイラを作っているところです。
+ここではビルド対象のOSSは3408個で、１つずつダウンロードして順番にビルドしているところです。
+この図では、CPUコア0がRaspberryPiのビルドをするためのarmコンパイラを作っているところです。
 armコンパイラを作ったら、
 RaspberryPi向けのLinuxビルドして、ファイルシステムに組み込む全コマンドをビルドします。
 確かに、時間はかかりそうです。
@@ -357,7 +359,8 @@ RaspberryPi向けのLinuxビルドして、ファイルシステムに組み込�
 PCがスリープしないように気をつけて、休憩ください。
 
 :::message
-残念ながらビルド失敗したら、
+残念ながらビルド失敗することがあります。
+よくある失敗例と対策を記載します。
 - 容量不足によるエラー
 Dockerの空き容量が無い可能性があります。
 "docker system df" コマンドを使って空き容量を確認して、不要なコンテナを削除してください。
@@ -374,7 +377,8 @@ ERROR: linux-raspberrypi-1_6.1.34+gitAUTOINC+ebdf12f741_d4c3133378-r0 do_fetch: 
 ```
 :::
 
-失敗したら、再度ビルドしたりしつつ、、、、、、やっと終わりました！
+そうこうして、、、、、、
+やっと終わりました！
 
 ```
 $ bitbake core-image-minimal
@@ -420,6 +424,15 @@ bitbake-cookerdaemon.log  cache  conf  downloads  sstate-cache  tmp
 tmp/deploy : 最終成果物を置くフォルダ
 tmp/work : ビルドしたソースコードなどが置いてあるフォルダ
 
+:::message
+諸事情により、もう一度すっきりゼロからビルドしたい時は、
+conf, downloads 以外のフォルダを削除して、
+bitbakeコマンドを再度実行ください。
+ダウンロード処理はスキップして、ビルドだけをゼロから実行します。
+bitbakeコマンドでビルド結果をクリアするコマンドもありますが、
+結構簡単なので、覚えておきましょう。
+:::
+
 ## ビルドイメージを取得する
 ビルドイメージは、以下になります（.wic.bz2ファイル）。
 
@@ -430,10 +443,9 @@ tmp/deploy/images/raspberrypi2/core-image-minimal-raspberrypi2.wic.bz2
 ```
 ２つあるように見えますが、シンボリックリンクなので日付があるファイルが本体になります。
 
-Mac側で、ターミナルを起動して、
-"docker ps"コマンドで、"raspi2-env"コンテナIDを確認し、
-”docker cp"コマンドで、ビルドイメージを現在のフォルダにコピーします。
-ついでに、"bunzip2"コマンドで解凍しておきます。
+Macのターミナルから、
+”docker cp"コマンドで、コンテナIDを指定してビルドイメージを現在のフォルダにコピーします。
+ついでに、"bunzip2"コマンドで解凍しておきましょう。
 ```
 $ docker ps
 CONTAINER ID   IMAGE          COMMAND       CREATED      STATUS              PORTS     NAMES
@@ -476,4 +488,5 @@ Poky（Yocto project Reference Distro) 4.2 raspberrypi2 でビルドされたも
 ということで、
 今回はゼロからビルドして、RasberryPiを起動するところまで行きました。
 
+次回は、AWS向けBSPレイヤーを更に追加して、AWS IoTサービスに必要な機能を追加しましょう。
 

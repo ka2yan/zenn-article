@@ -154,7 +154,7 @@ PING aqxxxx.ap-northeast-1.amazonaws.com(2400:.... (2400:...)) 56 data bytes
 成功しました。
 RaspberryPiからAWSまでの通信ができることが確認できました。
 #### Step2. デバイスを登録して保護する
-IoTデバイスとして、新しいモノを作成します。
+IoTデバイスとして、新しいモノ(Thing)を作成します。
 名前は、"raspi2"とします。
 ![](/images/20230611_170.png)
 #### Step3. プラットフォームとSDKを選択します
@@ -294,7 +294,7 @@ printf "\nRunning pub/sub sample application...\n"
 python3 aws-iot-device-sdk-python-v2/samples/pubsub.py --endpoint aqxxxx.ap-northeast-1.amazonaws.com --ca_file root-CA.crt --cert raspi2.cert.pem --key raspi2.private.key --client_id basicPubSub --topic sdk/test/python --count 0
 ```
 コメントを頼りに見ていくと、最終行、pubsub.py が怪しいですね。
-endpoint に向けて、topic sdk/test/python に対してメッセージを送っています。
+endpoint に向けて、トピック sdk/test/python に対してメッセージを送っています。
 
 aws-iot-device-sdk-python-v2/samples 下を見ると色々なコマンドが置いてありますので、
 もう少し深掘りしたい方は見て頂きたいですが、
