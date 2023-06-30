@@ -5,7 +5,7 @@ summary: |-
   ここでは、RaspberrypPiを製品と見立てて、AWSと接続するために必要な知識を、手を動かして学んでいきたいと思います。
 
 topics: ["raspberrypi", "yocto", "aws", "docker"]
-publication_name: "singularity"
+# publication_name: "singularity"
 published: true
 price: 0 # 有料の場合200〜5000
 # 本に含めるチャプターを順番に並べましょう
