@@ -1,7 +1,7 @@
 ---
 title: "ここで学べること"
 ---
-組込みエンジニア katsu です。
+組込みエンジニア katsu@[SinularitySoceiety](https://zenn.dev/p/singularity)です。
 
 組込み機器をクラウドを繋げるのは簡単だけど、ちゃんとやるのは意外と難しいですよね。
 
