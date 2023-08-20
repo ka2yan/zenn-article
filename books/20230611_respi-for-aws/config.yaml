@@ -13,3 +13,4 @@ chapters:
   - introduction
   - try-aws
   - try-raspi-build
+  - try-raspi-meta-aws-cpp
