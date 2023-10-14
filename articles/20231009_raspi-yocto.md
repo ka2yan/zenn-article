@@ -448,6 +448,8 @@ Sstate summary: Wanted 406 Local 394 Mirrors 0 Missed 12 Current 1251 (97% match
 NOTE: Executing Tasks
 NOTE: Tasks Summary: Attempted 3808 tasks of which 3786 didn't need to be rerun and all succeeded.
 ```
+ビルドエラーした場合は、[トラブルシュート](#トラブルシュート)を参照ください。
+
 どうでしょうか。
 あとは、meta-myapp/myapp/myapp/files下にあなたのプログラムを置いてRaspberryPiで動かしてみましょう。
 
