@@ -4,7 +4,7 @@ emoji: "🐕"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["raspberrypi", "yocto", "bitbake", "docker"]
 publication_name: "singularity"
-published: false
+published: true
 ---
 組込みエンジニア katsu です。
 
