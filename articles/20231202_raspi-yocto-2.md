@@ -353,7 +353,7 @@ Raspberry Pi Imagerで生成したイメージをSDカードに焼いて、起�
 今回も色々とハマってしまいました。
 注意点を記載しておきます。
 
-### ディレクトリ名、ファイル名を間違えるな
+### 1) ディレクトリ名、ファイル名を間違えるな
 私は実際タイポしました。間違えないようにしましょう。
 間違えても無視されるだけで、エラーが出ず、わかりにくいです。
 
@@ -362,7 +362,7 @@ Raspberry Pi Imagerで生成したイメージをSDカードに焼いて、起�
 | recipes | receipes |
 | .bbappend | .bbapend |
 
-### 追加レシピのファイル名を間違えるな
+### 2) 追加レシピのファイル名を間違えるな
 参照するレシピ（.bb）にバージョンがある場合とない場合があります。
 参照するレシピに合わせた追加レシピ（.bbappend）を作りましょう。
 
@@ -378,7 +378,7 @@ ERROR: No recipes in default available for:
   /home/hoge/raspi2/poky/meta-awsapp/recipes-support/curl/curl.bbappend
 ```
 
-### .bbappend 書き方を間違えるな
+### 3) .bbappend 書き方を間違えるな
 FILESEXTRAPATHS, SRC_URI がYoctoのバージョンによって書き方が違います。
 検索などでは新旧情報が混ざってヒットするので、注意しましょう。
 
@@ -394,24 +394,24 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI ＋= " file://0001-add-printf.patch"
 ```
 
-### 環境変数、do_compileの実際の処理内容を確認する
+### 4) 環境変数、do_compileの実際の処理内容を確認する
 ビルド時の環境変数や、do_patch, do_compileで、何をしているのか知りたい時、以下のコマンドが役立ちました。
 ```
 $ bitbake -e curl
 
 ```
-### meta-xx を別名に変更しない
+### 5) meta-xx を別名に変更しない
 bitbake-layer create-layerせずに、既にあるBSPレイヤーをcpコマンドなどでコピーしてrenameするのはやめた方が良いです。
 内部の設定ファイル（conf/layer.conf）にレイヤー名が入っているので、この辺も一緒に変更が必要になります。
 
-### filesディレクトリの指定が間違っている
+### 6) filesディレクトリの指定が間違っている
 追加レシピ（.bbappend）のEILESEXTRAPATHS指定が正しくない場合は、以下のようなエラーが出ます。
 ```
 ERROR: /home/hoge/raspi2/poky/meta/recipes-support/curl_8.1.2.bb: Unable to get checksum for nativesdk-curl SRC_URI entry 0001-add-print.patch: file could not be found
 The following paths were searched:
 ```
 
-### Upstream-Statusがない
+### 7) Upstream-Statusがない
 ```
 ERROR: curl-native-8.1.2-r0 do_patch: QA Issue: Missing Upstream-Status in patch
 /home/hoge/raspi2/poky/meta-mycmd/recipes-support/curl/files/0001-add-printf.patch
