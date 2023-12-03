@@ -99,7 +99,7 @@ index 2b7743a7e..dabad3903 100644
 Yocto４.0から、パッチファイルの位置付けを明記しなければならなくなりました。
 （今のところ、metaとか公式のBSPレイヤーへのパッチのみっぽい?）
 
-先頭に、Upstream-Status の１行を追加してください。[]は理由を記載するところです。
+先頭に、Upstream-Status の１行を追加してください。[ ]は理由を記載するところです。
 最終的なパッチは以下になります。
 
 ```diff:0001-add-printf.patch
@@ -132,7 +132,7 @@ Upstream-Status の記載できるStatusは以下。
 :::
 
 ## レシピを作る
-meta-mycmd ディレクトリには、recipes-exampleが入れてるので、削除しておきましょう
+meta-mycmd ディレクトリには、recipes-exampleがあります使わないので、削除しておきましょう
 ```
 $ cd meta-mycmd
 $ rm -fr recipes-example
@@ -363,7 +363,10 @@ Raspberry Pi Imagerで生成したイメージをSDカードに焼いて、起�
 | .bbappend | .bbapend |
 
 ### 追加レシピのファイル名を間違えるな
-|  正解  |  間違い |
+参照するレシピ（.bb）にバージョンがある場合とない場合があります。
+参照するレシピに合わせた追加レシピ（.bbappend）を作りましょう。
+
+|  バージョンがある場合  |  バージョンがない |
 | ---- | ---- |
 | name_%.bbappend | name.bbappend |
 
