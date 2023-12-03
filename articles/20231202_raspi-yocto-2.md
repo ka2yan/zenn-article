@@ -132,7 +132,7 @@ Upstream-Status の記載できるStatusは以下。
 :::
 
 ## レシピを作る
-meta-mycmd ディレクトリには、recipes-exampleがあります使わないので、削除しておきましょう
+meta-mycmd ディレクトリには、recipes-exampleがありますが使わないので、削除しておきましょう
 ```
 $ cd meta-mycmd
 $ rm -fr recipes-example
