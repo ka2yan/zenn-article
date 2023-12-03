@@ -4,7 +4,7 @@ emoji: "🐕"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["raspberrypi", "yocto", "bitbake", "docker"]
 publication_name: "singularity"
-published: false
+published: true
 ---
 [前回の記事](https://zenn.dev/singularity/articles/20230628_raspi-yocto)では、RaspberryPi向けにYoctoビルド環境に自分で作ったプログラムを追加しました。
 ただ、実際にものを作るときには、必ずしも自分のプログラムだけではなく、必要に応じてOSSを自分で修正する必要があります。
@@ -71,10 +71,11 @@ curlは、meta レイヤーにレシピがあって、バージョンは 8.1.2 �
 
 curl 8.1.2のコードを持ってきて、修正を入れましょう。
 :::message
-例えば、以下のような感じで取ってきます。
+自分向けメモ
+手抜きパッチで良ければ、以下のような感じで取ってきて、修正できます。
 $ git clone https://github.com/curl/curl.git -b curl-8_1_2
 $ cd curl/src
-$ ...
+$ vi ...
 :::
 今回は、お試しとしてコマンドを起動したときに、”I am RaspberryPi"を最初に出力するパッチを作ります。
 
@@ -96,7 +97,7 @@ index 2b7743a7e..dabad3903 100644
 
 最近までは、このdiffをそのままファイルに落としてYoctoに組み込めたのですが、
 Yocto４.0から、パッチファイルの位置付けを明記しなければならなくなりました。
-（今のところ、metaとか公式のBSPレイヤーへのパッチのみっぽいですが）
+（今のところ、metaとか公式のBSPレイヤーへのパッチのみっぽい?）
 
 先頭に、Upstream-Status の１行を追加してください。[]は理由を記載するところです。
 最終的なパッチは以下になります。
@@ -344,7 +345,7 @@ $ bitbake -c compile -f curl
 ## 動作確認する
 RaspberryPiに焼いて、実際の動作確認してみてください。
 Raspberry Pi Imagerで生成したイメージをSDカードに焼いて、起動します。
-[こちら](https://zenn.dev/singularity/articles/20230820_raspi-for-aws-3#raspberrypiからメッセージを送信する%E3%80%82)を参照ください。
+[前回の記事](https://zenn.dev/singularity/articles/20230820_raspi-for-aws-3#raspberrypiからメッセージを送信する%E3%80%82)を参照ください。
 
 
 
@@ -425,6 +426,7 @@ git diffコマンドで出力したパッチファイルをそのまま適用で
 以下のページは、大変助かりました。ありがとうございました。
 
 https://yoctobbq.lineo.co.jp/?q=node/385
+
 https://docs.yoctoproject.org/migration-guides/migration-3.4.html
 
 https://yoctobbq.lineo.co.jp/?q=node/433
