@@ -1,5 +1,5 @@
 ---
-title: "RaspberryPiをクラウドとちゃんと話せるようにする（第３回）"
+title: "RaspberryPiをクラウドとちゃんと話せるようにする（第４回）"
 emoji: "📘"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["raspberrypi", "yocto", "aws", "docker"]
