@@ -1,6 +1,44 @@
 ---
-title: "AWS IoT Coreとメッセージ送受信するプログラムを作る"
+title: "RaspberryPiをクラウドとちゃんと話せるようにする（第３回）"
+emoji: "📘"
+type: "tech" # tech: 技術記事 / idea: アイデア
+topics: ["raspberrypi", "yocto", "aws", "docker"]
+publication_name: "singularity"
+published: true
+
 ---
+組込みエンジニア katsu です。
+
+RaspberryPiをクラウドとちゃんと話せるようにする、第４回です。
+全体の位置付けは以下となります。
+
+# [第１回](https://zenn.dev/singularity/articles/20230611_raspi-for-aws-1)
+お試しで、RaspberryPiをAWS IoTと繋げてみます。
+AWSに公開されている手順で、RaspberryPiとAWS IoTサービスを繋げて、メッセージの送受信をしてみます。
+
+# [第２回](https://zenn.dev/singularity/articles/20230628_raspi-for-aws-2)
+RaspberryPiをゼロからビルドできる環境を構築します。
+DockerでUbuntu環境を立ち上げ、Yoctoというビルドシステムを用いてビルドします。
+初めてビルドすると、一晩ぐらいかかります。大変。
+
+# [第3回](https://zenn.dev/singularity/articles/20230628_raspi-for-aws-3)
+AWS IoTサービス向けに必要な機能を組込みます。
+AWSが提供しているAWS IoT向けレシピ集 meta-aws をYoctoビルドシステムに組み込むことで、AWS接続できる機能を組み込むことができます。
+
+# 第4回（今回ココ）
+RaspberryPiとAWS IoTサービスとメッセージの送受信をしてみます。
+RaspberryPi視点で、好きなメッセージをどうやって送るのか、AWS上でどうやって受信するのか、確認します。
+
+# 第5回
+RaspberryPiとAWS IoTサービスとメッセージの送受信をしてみます。
+AWS視点で証明書管理をどうするのか、受信したメッセージをどうアクションに繋げるにはどうするのか、を確認していきたいと思います。
+
+# 第6回
+AWSに接続するために必要な情報をどうやって組み込むのか考えます。
+AWSと接続するために必要な情報は何か、RaspberryPiに組み込むには、どのような方法があるのか、考察します。
+
+----
+# 第４回：  RaspberryPi の AWS IoT 接続機能をカスタマイズする
 
 前回は、RaspberryPiにAWS IoT接続に必要な機能を組み込んで、接続確認までを行いました。
 この時はAWSとのメッセージの送受信は、mqtt5_pubsubというAWSが公開しているサンプルコマンドを使用しました。
