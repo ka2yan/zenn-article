@@ -14,3 +14,4 @@ chapters:
   - try-aws
   - try-raspi-build
   - try-raspi-meta-aws-cpp
+  - try-raspi-mqtt-cmd
